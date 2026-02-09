@@ -1,0 +1,28 @@
+package com.taskmanager.TaskManager.company.controller;
+
+import com.taskmanager.TaskManager.company.dto.CompanyRequestDTO;
+import com.taskmanager.TaskManager.company.dto.CompanyResponseDTO;
+import com.taskmanager.TaskManager.company.service.CompanyService;
+import com.taskmanager.TaskManager.users.entity.User;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController("/company")
+public class CompanyController {
+
+    private final CompanyService cService;
+
+    public CompanyController(CompanyService cService) {
+        this.cService = cService;
+    }
+
+    @GetMapping("/{companyName}")
+    public ResponseEntity<CompanyResponseDTO> getMyCompany(@PathVariable String companyName) {
+
+        return ResponseEntity.ok(cService.getMyCompany(companyName));
+
+    }
+
+}
