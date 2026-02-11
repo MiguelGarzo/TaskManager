@@ -32,7 +32,7 @@ public class UserService {
         User user = uRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Long companyId = user.getCompanyId();
+        Long companyId = user.getCompany().getId();
 
         return uRepository.findByCompanyId(companyId).stream().map(this::toResponse).collect(Collectors.toList());
     }

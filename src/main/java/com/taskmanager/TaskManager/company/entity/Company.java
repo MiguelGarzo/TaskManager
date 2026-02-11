@@ -1,18 +1,15 @@
 package com.taskmanager.TaskManager.company.entity;
 
 import com.taskmanager.TaskManager.users.entity.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,8 +27,8 @@ public class Company {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @ManyToOne
-    private User user;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<User> users = new ArrayList<>();
 
     private String adress;
 

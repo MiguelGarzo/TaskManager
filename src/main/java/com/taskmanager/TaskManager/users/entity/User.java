@@ -1,16 +1,9 @@
 package com.taskmanager.TaskManager.users.entity;
 
+import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.users.Role;
 import com.taskmanager.TaskManager.users.Status;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,10 +35,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @NotNull
-    @Column(nullable = false)
-    @OneToMany
-    private Long CompanyId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
