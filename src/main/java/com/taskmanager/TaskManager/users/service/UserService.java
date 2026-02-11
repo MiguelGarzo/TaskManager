@@ -3,6 +3,7 @@ package com.taskmanager.TaskManager.users.service;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.users.Status;
+import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
@@ -37,6 +38,15 @@ public class UserService {
         return dto;
     }
 
+    public List<UserResponseDTO> getAllCompanyUsers(String username) {
+        User user = uRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Long companyId = user.getCompany().getId();
+
+        return uRepository.findByCompanyId(companyId).stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
     public UserResponseDTO createUser(UserRegisterDTO dto) {
         User user = new User();
         user.setUsername(dto.getUsername());
@@ -46,20 +56,17 @@ public class UserService {
         user.setStatus(Status.NORMAL);
 
         Company company = cRepository.findById(dto.getCompany().getId())
-                        .orElseThrow(() -> new RuntimeException("Company not found"));
+                .orElseThrow(() -> new RuntimeException("Company not found"));
         user.setCompany(company);
 
         uRepository.save(user);
         return toResponse(user);
     }
 
-    public List<UserResponseDTO> getAllCompanyUsers(String username) {
-        User user = uRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public String login(UserLoginDTO dto) {
 
-        Long companyId = user.getCompany().getId();
 
-        return uRepository.findByCompanyId(companyId).stream().map(this::toResponse).collect(Collectors.toList());
+
     }
 
 }

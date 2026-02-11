@@ -21,6 +21,7 @@ public class CompanyService {
         CompanyResponseDTO dto = new CompanyResponseDTO();
         dto.setId(company.getId());
         dto.setName(company.getName());
+        dto.setAdress(company.getAdress());
 
         return dto;
     }
