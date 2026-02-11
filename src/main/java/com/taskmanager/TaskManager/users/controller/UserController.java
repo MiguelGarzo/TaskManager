@@ -4,7 +4,10 @@ import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -19,10 +22,16 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAllCompanyUsers(User user) {
+    public ResponseEntity<List<UserResponseDTO>> getAllCompanyUsers() {
 
-        String username = user.getUsername();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
         return ResponseEntity.ok(service.getAllCompanyUsers(username));
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponseDTO> registerUser() {
 
     }
 

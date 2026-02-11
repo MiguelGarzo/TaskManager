@@ -1,8 +1,15 @@
 package com.taskmanager.TaskManager.users.service;
 
+import com.taskmanager.TaskManager.company.entity.Company;
+import com.taskmanager.TaskManager.company.repository.CompanyRepository;
+import com.taskmanager.TaskManager.users.Status;
+import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +20,12 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository uRepository;
+    private final CompanyRepository cRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService (UserRepository uRepository, PasswordEncoder passwordEncoder) {
+    public UserService (UserRepository uRepository, PasswordEncoder passwordEncoder, CompanyRepository cRepository) {
         this.uRepository = uRepository;
+        this.cRepository = cRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -26,6 +35,22 @@ public class UserService {
         dto.setUsername(user.getUsername());
 
         return dto;
+    }
+
+    public UserResponseDTO createUser(UserRegisterDTO dto) {
+        User user = new User();
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        user.setStatus(Status.NORMAL);
+
+        Company company = cRepository.findById(dto.getCompany().getId())
+                        .orElseThrow(() -> new RuntimeException("Company not found"));
+        user.setCompany(company);
+
+        uRepository.save(user);
+        return toResponse(user);
     }
 
     public List<UserResponseDTO> getAllCompanyUsers(String username) {

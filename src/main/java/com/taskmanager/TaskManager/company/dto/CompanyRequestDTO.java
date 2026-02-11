@@ -8,5 +8,6 @@ import lombok.Setter;
 public class CompanyRequestDTO {
 
     private String name;
+    private String adress;
 
 }

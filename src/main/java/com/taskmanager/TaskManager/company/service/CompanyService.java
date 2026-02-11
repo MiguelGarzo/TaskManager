@@ -34,4 +34,13 @@ public class CompanyService {
 
     }
 
+    public CompanyResponseDTO createCompany(CompanyRequestDTO dto) {
+        Company company = new Company();
+        company.setName(dto.getName());
+        company.setAdress(dto.getAdress());
+
+        cRepository.save(company);
+        return toResponse(company);
+    }
+
 }
