@@ -30,10 +30,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllCompanyUsers() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return ResponseEntity.ok(service.getAllCompanyUsers(username));
+        return ResponseEntity.ok(service.getAllCompanyUsers());
     }
 
     @PostMapping("/register")

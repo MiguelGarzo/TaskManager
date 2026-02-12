@@ -3,7 +3,6 @@ package com.taskmanager.TaskManager.company.controller;
 import com.taskmanager.TaskManager.company.dto.CompanyRequestDTO;
 import com.taskmanager.TaskManager.company.dto.CompanyResponseDTO;
 import com.taskmanager.TaskManager.company.service.CompanyService;
-import com.taskmanager.TaskManager.users.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

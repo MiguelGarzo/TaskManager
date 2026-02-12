@@ -5,6 +5,7 @@ import com.taskmanager.TaskManager.company.dto.CompanyResponseDTO;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.users.Role;
+import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.service.UserService;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 
 @Service
 public class CompanyService {
@@ -55,14 +57,15 @@ public class CompanyService {
 
         cRepository.save(company);
 
-        UserRegisterDTO user = new UserRegisterDTO();
+        UserRegisterAutDTO user = new UserRegisterAutDTO();
         user.setUsername("admin");
         user.setPassword("admin");
         user.setEmail("admin@example.com");
         user.setRole(Role.ADMIN);
+
         user.setCompany(company);
 
-        uService.createUser(user);
+        uService.createAutUser(user);
 
         return toResponse(company);
 
@@ -74,5 +77,4 @@ public class CompanyService {
 
         company.addToList(user);
     }
-
 }

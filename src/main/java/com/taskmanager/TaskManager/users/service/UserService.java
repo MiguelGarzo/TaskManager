@@ -8,6 +8,7 @@ import com.taskmanager.TaskManager.security.JwtUtil;
 import com.taskmanager.TaskManager.users.CustomUserDetailsService;
 import com.taskmanager.TaskManager.users.Status;
 import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
+import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
@@ -15,10 +16,7 @@ import com.taskmanager.TaskManager.users.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +40,8 @@ public class UserService {
                         JwtUtil jwtUtil,
                         CustomUserDetailsService customUserDetailsService,
                         AuthenticationManager authenticationManager,
-                        CompanyService cService)
+                        CompanyService cService
+                        )
     {
         this.uRepository = uRepository;
         this.cRepository = cRepository;
@@ -61,7 +60,11 @@ public class UserService {
         return dto;
     }
 
-    public List<UserResponseDTO> getAllCompanyUsers(String username) {
+    public List<UserResponseDTO> getAllCompanyUsers() {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
         User user = uRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -78,13 +81,31 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus(Status.NORMAL);
 
-        Company company = cRepository.findById(dto.getCompany().getId())
-                .orElseThrow(() -> new RuntimeException("Company not found"));
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        User cUser = uRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Company company = cUser.getCompany();
+
         user.setCompany(company);
 
         uRepository.save(user);
 
         cService.addUserToCompany(user);
+
+        return toResponse(user);
+    }
+
+    public UserResponseDTO createAutUser(UserRegisterAutDTO autDTO) {
+        User user = new User();
+        user.setUsername(autDTO.getUsername());
+        user.setEmail(autDTO.getEmail());
+        user.setRole(autDTO.getRole());
+        user.setPassword(passwordEncoder.encode(autDTO.getPassword()));
+        user.setStatus(Status.NORMAL);
+        user.setCompany(autDTO.getCompany());
 
         return toResponse(user);
     }
