@@ -32,4 +32,8 @@ public class Company {
 
     private String adress;
 
+    public void addToList(User user) {
+        users.add(user);
+    }
+
 }

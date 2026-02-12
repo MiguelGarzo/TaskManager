@@ -2,14 +2,22 @@ package com.taskmanager.TaskManager.users.service;
 
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
+import com.taskmanager.TaskManager.company.service.CompanyService;
+import com.taskmanager.TaskManager.security.CustomUserDetails;
+import com.taskmanager.TaskManager.security.JwtUtil;
+import com.taskmanager.TaskManager.users.CustomUserDetailsService;
 import com.taskmanager.TaskManager.users.Status;
 import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,11 +31,26 @@ public class UserService {
     private final UserRepository uRepository;
     private final CompanyRepository cRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final AuthenticationManager authenticationManager;
+    private final CompanyService cService;
 
-    public UserService (UserRepository uRepository, PasswordEncoder passwordEncoder, CompanyRepository cRepository) {
+    public UserService (UserRepository uRepository,
+                        PasswordEncoder passwordEncoder,
+                        CompanyRepository cRepository,
+                        JwtUtil jwtUtil,
+                        CustomUserDetailsService customUserDetailsService,
+                        AuthenticationManager authenticationManager,
+                        CompanyService cService)
+    {
         this.uRepository = uRepository;
         this.cRepository = cRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
+        this.customUserDetailsService = customUserDetailsService;
+        this.authenticationManager = authenticationManager;
+        this.cService = cService;
     }
 
     public UserResponseDTO toResponse(User user) {
@@ -60,12 +83,25 @@ public class UserService {
         user.setCompany(company);
 
         uRepository.save(user);
+
+        cService.addUserToCompany(user);
+
         return toResponse(user);
     }
 
     public String login(UserLoginDTO dto) {
 
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        dto.getUsername(),
+                        dto.getPassword()
+                )
+        );
 
+        CustomUserDetails userDetails =
+                (CustomUserDetails) customUserDetailsService.loadUserByUsername(dto.getUsername());
+
+        return jwtUtil.tokenGen(userDetails);
 
     }
 
