@@ -107,6 +107,9 @@ public class UserService {
         user.setStatus(Status.NORMAL);
         user.setCompany(autDTO.getCompany());
 
+        uRepository.save(user);
+        cService.addUserToCompany(user);
+
         return toResponse(user);
     }
 
