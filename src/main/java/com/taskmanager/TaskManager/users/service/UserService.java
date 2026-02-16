@@ -5,6 +5,7 @@ import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.company.service.CompanyService;
 import com.taskmanager.TaskManager.security.CustomUserDetails;
 import com.taskmanager.TaskManager.security.JwtUtil;
+import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.CustomUserDetailsService;
 import com.taskmanager.TaskManager.users.Status;
 import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
@@ -123,6 +124,14 @@ public class UserService {
                 (CustomUserDetails) customUserDetailsService.loadUserByUsername(dto.getUsername());
 
         return jwtUtil.tokenGen(userDetails);
+
+    }
+
+    public void addTaskToList(Task task, User user) {
+
+        List<Task> tasks = user.getTasks();
+
+        tasks.add(task);
 
     }
 
