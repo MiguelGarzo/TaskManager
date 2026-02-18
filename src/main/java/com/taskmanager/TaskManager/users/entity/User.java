@@ -1,6 +1,7 @@
 package com.taskmanager.TaskManager.users.entity;
 
 import com.taskmanager.TaskManager.company.entity.Company;
+import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.Role;
 import com.taskmanager.TaskManager.users.Status;
 import jakarta.persistence.*;
@@ -55,7 +56,7 @@ public class User {
     private Status status = Status.NORMAL;
 
     @OneToMany(mappedBy = "responsible", cascade = CascadeType.ALL)
-    private List tasks = new ArrayList<>();
+    private List<Task> tasks = new ArrayList<>();
 
 
 }

@@ -1,7 +1,7 @@
 package com.taskmanager.TaskManager.task.dto;
 
 import com.taskmanager.TaskManager.comentary.entity.Comentary;
-import com.taskmanager.TaskManager.comentary.subtask.Subtask;
+import com.taskmanager.TaskManager.subtask.Subtask;
 import com.taskmanager.TaskManager.users.entity.User;
 import lombok.Getter;
 import lombok.Setter;
