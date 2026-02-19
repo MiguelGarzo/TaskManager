@@ -9,6 +9,7 @@ import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -73,7 +74,7 @@ public class CompanyService {
 
     public void addUserToCompany(User user) {
         Company company = cRepository.findById(user.getCompany().getId())
-                .orElseThrow(() -> new RuntimeException("Company does not exists"));
+                .orElseThrow(() -> new EntityNotFoundException("Company does not exists"));
 
         company.addToList(user);
     }

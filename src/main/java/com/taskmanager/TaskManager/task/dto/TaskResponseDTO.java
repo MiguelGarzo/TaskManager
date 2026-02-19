@@ -2,6 +2,8 @@ package com.taskmanager.TaskManager.task.dto;
 
 import com.taskmanager.TaskManager.comentary.entity.Comentary;
 import com.taskmanager.TaskManager.subtask.Subtask;
+import com.taskmanager.TaskManager.task.Priority;
+import com.taskmanager.TaskManager.task.TaskStatus;
 import com.taskmanager.TaskManager.users.entity.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,5 +25,7 @@ public class TaskResponseDTO {
     private List<Subtask> subtask = new ArrayList<>();
     private Date initDate;
     private Date finishDate;
+    private TaskStatus status;
+    private Priority priority;
 
 }

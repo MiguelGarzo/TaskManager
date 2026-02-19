@@ -2,6 +2,8 @@ package com.taskmanager.TaskManager.task.entity;
 
 import com.taskmanager.TaskManager.comentary.entity.Comentary;
 import com.taskmanager.TaskManager.subtask.Subtask;
+import com.taskmanager.TaskManager.task.Priority;
+import com.taskmanager.TaskManager.task.TaskStatus;
 import com.taskmanager.TaskManager.users.entity.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -38,6 +40,10 @@ public class Task {
     private String name;
     @NotNull
     private String body;
+    @NotNull
+    private TaskStatus status;
+    @NotNull
+    private Priority priority;
 
     @OneToMany(mappedBy = "comentary", cascade = CascadeType.ALL)
     private List<Comentary> comentary = new ArrayList<>();

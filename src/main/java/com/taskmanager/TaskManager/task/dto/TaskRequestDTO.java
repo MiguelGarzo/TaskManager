@@ -1,5 +1,7 @@
 package com.taskmanager.TaskManager.task.dto;
 
+import com.taskmanager.TaskManager.task.Priority;
+import com.taskmanager.TaskManager.task.TaskStatus;
 import com.taskmanager.TaskManager.users.entity.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,5 +17,8 @@ public class TaskRequestDTO {
     private User responsible;
     private Date initDate;
     private Date finishDate;
+    private TaskStatus status;
+    private Priority priority;
+    private User resposible;
 
 }

@@ -6,12 +6,8 @@ import com.taskmanager.TaskManager.task.dto.TaskResponseDTO;
 import com.taskmanager.TaskManager.task.service.TaskService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -39,4 +35,22 @@ public class TaskController {
     public ResponseEntity<List<TaskResponseDTO>> userTasks() {
         return ResponseEntity.ok(tService.userTasks());
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{username}")
+    public ResponseEntity<List<TaskResponseDTO>> tasksByUser(@PathVariable String username) {
+        return ResponseEntity.ok(tService.tasksByUser(username));
+    }
+
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskResponseDTO> editTask(@PathVariable Long taskId, @RequestBody TaskRequestDTO dto) {
+        return ResponseEntity.ok(tService.editTask(taskId, dto));
+    }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> removeTask(@PathVariable Long taskId) {
+        tService.removeTask(taskId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

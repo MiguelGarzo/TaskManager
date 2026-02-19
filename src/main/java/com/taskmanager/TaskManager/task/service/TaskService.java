@@ -10,6 +10,7 @@ import com.taskmanager.TaskManager.task.repository.TaskRepository;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import com.taskmanager.TaskManager.users.service.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,8 @@ public class TaskService {
         dto.setResponsible(task.getResponsible());
         dto.setInitDate(task.getInitDate());
         dto.setFinishDate(task.getFinishDate());
+        dto.setPriority(task.getPriority());
+        dto.setStatus(task.getStatus());
 
         return dto;
     }
@@ -47,7 +50,7 @@ public class TaskService {
     public TaskResponseDTO getTaskById(Long taskId) {
 
         Task task = tRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
         return toResponse(task);
 
@@ -61,13 +64,16 @@ public class TaskService {
         task.setResponsible(dto.getResponsible());
         task.setInitDate(dto.getInitDate());
         task.setFinishDate(dto.getFinishDate());
+        task.setPriority(dto.getPriority());
+        task.setStatus(dto.getStatus());
+        task.setResponsible(dto.getResponsible());
 
         User responsible = dto.getResponsible();
         uService.addTaskToList(task, responsible);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User owner = uRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User" + username + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         task.setOwner(owner);
 
@@ -82,11 +88,55 @@ public class TaskService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = uRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User" + username + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();
 
         return tasks.stream().map(this::toResponse).toList();
+
+    }
+
+    public List<TaskResponseDTO> tasksByUser(String username) {
+        User user = uRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
+
+        List<Task> tasks = user.getTasks();
+
+        return tasks.stream().map(this::toResponse).toList();
+    }
+
+    public TaskResponseDTO editTask(Long taskId, TaskRequestDTO dto) {
+        Task task = tRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
+
+        User previousResponsible = task.getResponsible();
+        uService.deleteTaskFromList(task, previousResponsible);
+
+        task.setBody(dto.getBody());
+        task.setName(dto.getName());
+        task.setResponsible(dto.getResponsible());
+        task.setInitDate(dto.getInitDate());
+        task.setFinishDate(dto.getFinishDate());
+        task.setPriority(dto.getPriority());
+        task.setStatus(dto.getStatus());
+        task.setResponsible(dto.getResponsible());
+
+        User responsible = dto.getResponsible();
+        uService.addTaskToList(task, responsible);
+
+        return toResponse(task);
+
+    }
+
+    public void removeTask(Long taskId) {
+
+        Task task = tRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
+
+        User user = task.getResponsible();
+        uService.deleteTaskFromList(task, user);
+
+        tRepository.delete(task);
 
     }
 

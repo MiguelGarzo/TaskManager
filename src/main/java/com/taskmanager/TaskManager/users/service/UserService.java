@@ -14,6 +14,7 @@ import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -67,7 +68,7 @@ public class UserService {
         String username = auth.getName();
 
         User user = uRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Long companyId = user.getCompany().getId();
 
@@ -86,7 +87,7 @@ public class UserService {
         String username = auth.getName();
 
         User cUser = uRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Company company = cUser.getCompany();
 
@@ -136,6 +137,12 @@ public class UserService {
 
         tasks.add(task);
 
+    }
+
+    public void deleteTaskFromList(Task task, User user) {
+        List<Task> tasks = user.getTasks();
+
+        tasks.remove(task);
     }
 
 }
