@@ -1,7 +1,7 @@
 package com.taskmanager.TaskManager.task.dto;
 
 import com.taskmanager.TaskManager.comentary.entity.Comentary;
-import com.taskmanager.TaskManager.subtask.Subtask;
+import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.task.Priority;
 import com.taskmanager.TaskManager.task.TaskStatus;
 import com.taskmanager.TaskManager.users.entity.User;

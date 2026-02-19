@@ -9,10 +9,12 @@ import com.taskmanager.TaskManager.task.repository.TaskRepository;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Transactional
 public class SubtaskService {
 
     private SubtaskRepository sRepository;
@@ -70,6 +72,33 @@ public class SubtaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
         stask.setCompleted(true);
+    }
+
+    public SubtaskResponseDTO editSubtask(SubtaskRequestDTO dto) {
+
+        Subtask stask = sRepository.findById(dto.getTaskId())
+                .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
+
+        stask.setName(dto.getName());
+        stask.setBody(dto.getBody());
+
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+                        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        stask.setResponsible(responsible);
+
+        Task task = tRepository.findById(dto.getTaskId())
+                        .orElseThrow(() -> new EntityNotFoundException("Task not found"));
+        stask.setTask(task);
+
+        return toResponse(stask);
+
+    }
+
+    public void removeSubtask(Long subtaskId) {
+        Subtask stask = sRepository.findById(subtaskId)
+                .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
+
+        sRepository.delete(stask);
     }
 
 }

@@ -21,10 +21,24 @@ public class SubtaskController {
         return ResponseEntity.ok(sService.createSubtask(dto));
     }
 
-    @PutMapping("/complete/{subtaskId}")
+    @PatchMapping("/complete/{subtaskId}")
     public ResponseEntity<Void> markAsCompleted(@PathVariable Long subtaskId) {
         sService.markAsCompleted(subtaskId);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping()
+    public ResponseEntity<SubtaskResponseDTO> editSubtask(@RequestBody SubtaskRequestDTO dto) {
+
+        return ResponseEntity.ok(sService.editSubtask(dto));
+
+    }
+
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteSubtask(@PathVariable Long taskId) {
+        sService.removeSubtask(taskId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
