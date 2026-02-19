@@ -1,4 +1,4 @@
-package com.taskmanager.TaskManager.subtask;
+package com.taskmanager.TaskManager.subtask.entity;
 
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.entity.User;
@@ -33,5 +33,5 @@ public class Subtask {
     @ManyToOne(optional = false)
     @JoinColumn(name = "responsible_id", nullable = false)
     private User responsible;
-
+    private Boolean completed;
 }

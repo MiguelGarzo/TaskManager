@@ -9,6 +9,7 @@ public class SubtaskRequestDTO {
 
     private String name;
     private String body;
-
+    private Long taskId;
+    private String responsibleUsername;
 
 }
