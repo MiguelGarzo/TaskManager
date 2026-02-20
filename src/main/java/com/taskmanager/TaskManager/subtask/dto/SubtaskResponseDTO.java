@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class SubtaskResponseDTO {
 
+    private Long subtaskId;
     private String name;
     private String body;
     private Task task;

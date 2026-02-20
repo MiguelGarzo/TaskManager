@@ -3,6 +3,8 @@ package com.taskmanager.TaskManager.task.service;
 import com.taskmanager.TaskManager.comentary.dto.ComentResponseDTO;
 import com.taskmanager.TaskManager.comentary.entity.Comentary;
 import com.taskmanager.TaskManager.comentary.service.ComentaryService;
+import com.taskmanager.TaskManager.subtask.entity.Subtask;
+import com.taskmanager.TaskManager.subtask.repository.SubtaskRepository;
 import com.taskmanager.TaskManager.task.dto.TaskRequestDTO;
 import com.taskmanager.TaskManager.task.dto.TaskResponseDTO;
 import com.taskmanager.TaskManager.task.entity.Task;
@@ -22,11 +24,17 @@ public class TaskService {
     private final TaskRepository tRepository;
     private final UserRepository uRepository;
     private final UserService uService;
+    private final SubtaskRepository sRepository;
 
-    public TaskService(TaskRepository tRepository, UserRepository uRepository, UserService uService) {
+    public TaskService(TaskRepository tRepository,
+                       UserRepository uRepository,
+                       UserService uService,
+                       SubtaskRepository sRepository)
+    {
         this.tRepository = tRepository;
         this.uRepository = uRepository;
         this.uService = uService;
+        this.sRepository = sRepository;
     }
 
     public TaskResponseDTO toResponse(Task task) {
@@ -138,6 +146,30 @@ public class TaskService {
 
         tRepository.delete(task);
 
+    }
+
+    public void addSubtaskToTask(Long taskId, Long subtaskId) {
+        Task task = tRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
+
+        Subtask stask = sRepository.findById(subtaskId)
+                .orElseThrow(() -> new EntityNotFoundException("Subtask" + subtaskId + "not found"));
+
+        List<Subtask> subtasks = task.getSubtask();
+
+        subtasks.add(stask);
+    }
+
+    public void removeSubtaskFromTask(Long taskId, Long subtaskId) {
+        Task task = tRepository.findById(taskId)
+                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
+
+        Subtask stask = sRepository.findById(subtaskId)
+                .orElseThrow(() -> new EntityNotFoundException("Subtask" + subtaskId + "not found"));
+
+        List<Subtask> subtasks = task.getSubtask();
+
+        subtasks.remove(stask);
     }
 
 }
