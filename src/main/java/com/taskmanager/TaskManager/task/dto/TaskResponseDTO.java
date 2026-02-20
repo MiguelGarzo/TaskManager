@@ -1,6 +1,6 @@
 package com.taskmanager.TaskManager.task.dto;
 
-import com.taskmanager.TaskManager.comentary.entity.Comentary;
+import com.taskmanager.TaskManager.comentary.entity.Commentary;
 import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.task.Priority;
 import com.taskmanager.TaskManager.task.TaskStatus;
@@ -19,7 +19,7 @@ public class TaskResponseDTO {
     private Long id;
     private String name;
     private String body;
-    private List<Comentary> comentary = new ArrayList<>();
+    private List<Commentary> commentary = new ArrayList<>();
     private User owner;
     private User responsible;
     private List<Subtask> subtask = new ArrayList<>();

@@ -78,7 +78,7 @@ public class SubtaskService {
                 .orElseThrow(() -> new EntityNotFoundException("Task " + taskId + " not found"));
         stask.setTask(task);
 
-        tService.addSubtaskToTask(stask.getTask().getId(), stask.getId());
+        tService.addSubtaskToTask(stask.getTask(), stask);
         sRepository.save(stask);
 
         return toResponse(stask);
@@ -106,12 +106,12 @@ public class SubtaskService {
 
         Task previousTask = tRepository.findById(stask.getTask().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-        tService.removeSubtaskFromTask(previousTask.getId(), stask.getId());
+        tService.removeSubtaskFromTask(previousTask, stask);
 
         Task task = tRepository.findById(dto.getTaskId())
                         .orElseThrow(() -> new EntityNotFoundException("Task not found"));
         stask.setTask(task);
-        tService.addSubtaskToTask(task.getId(), stask.getId());
+        tService.addSubtaskToTask(task, stask);
 
         return toResponse(stask);
 

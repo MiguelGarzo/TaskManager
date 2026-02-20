@@ -1,5 +1,8 @@
 package com.taskmanager.TaskManager.users.service;
 
+import com.taskmanager.TaskManager.comentary.entity.Commentary;
+import com.taskmanager.TaskManager.comentary.repository.CommentaryRepository;
+import com.taskmanager.TaskManager.comentary.service.CommentaryService;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.company.service.CompanyService;
@@ -15,6 +18,8 @@ import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.TransactionScoped;
+import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class UserService {
 
     private final UserRepository uRepository;
@@ -35,6 +41,7 @@ public class UserService {
     private final CustomUserDetailsService customUserDetailsService;
     private final AuthenticationManager authenticationManager;
     private final CompanyService cService;
+    private final CommentaryRepository commentaryRepository;
 
     public UserService (UserRepository uRepository,
                         PasswordEncoder passwordEncoder,
@@ -42,7 +49,8 @@ public class UserService {
                         JwtUtil jwtUtil,
                         CustomUserDetailsService customUserDetailsService,
                         AuthenticationManager authenticationManager,
-                        CompanyService cService
+                        CompanyService cService,
+                        CommentaryRepository commentaryRepository
                         )
     {
         this.uRepository = uRepository;
@@ -52,12 +60,14 @@ public class UserService {
         this.customUserDetailsService = customUserDetailsService;
         this.authenticationManager = authenticationManager;
         this.cService = cService;
+        this.commentaryRepository = commentaryRepository;
     }
 
     public UserResponseDTO toResponse(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
+        dto.setStatus(user.getStatus());
 
         return dto;
     }
@@ -131,18 +141,25 @@ public class UserService {
 
     }
 
+    public UserResponseDTO upgradeUser(){
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User user = uRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        //Falta el codigo de Stripe
+
+        user.setStatus(Status.PREMIUM);
+
+        return toResponse(user);
+    }
+
     public void addTaskToList(Task task, User user) {
-
-        List<Task> tasks = user.getTasks();
-
-        tasks.add(task);
-
+        user.getTasks().add(task);
     }
 
     public void deleteTaskFromList(Task task, User user) {
-        List<Task> tasks = user.getTasks();
-
-        tasks.remove(task);
+        user.getTasks().remove(task);
     }
 
 }

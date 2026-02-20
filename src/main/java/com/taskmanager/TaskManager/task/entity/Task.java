@@ -1,6 +1,6 @@
 package com.taskmanager.TaskManager.task.entity;
 
-import com.taskmanager.TaskManager.comentary.entity.Comentary;
+import com.taskmanager.TaskManager.comentary.entity.Commentary;
 import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.task.Priority;
 import com.taskmanager.TaskManager.task.TaskStatus;
@@ -45,8 +45,8 @@ public class Task {
     @NotNull
     private Priority priority;
 
-    @OneToMany(mappedBy = "comentary", cascade = CascadeType.ALL)
-    private List<Comentary> comentary = new ArrayList<>();
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<Commentary> commentary = new ArrayList<>();
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id", nullable = false)

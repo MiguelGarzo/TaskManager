@@ -1,6 +1,5 @@
 package com.taskmanager.TaskManager.task.controller;
 
-import com.taskmanager.TaskManager.comentary.dto.ComentResponseDTO;
 import com.taskmanager.TaskManager.task.dto.TaskRequestDTO;
 import com.taskmanager.TaskManager.task.dto.TaskResponseDTO;
 import com.taskmanager.TaskManager.task.service.TaskService;

@@ -6,9 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ComentResponseDTO {
+public class CommentResponseDTO {
 
-    private String comentary;
+    private Long commentId;
+    private String commentary;
     private Task task;
 
 }

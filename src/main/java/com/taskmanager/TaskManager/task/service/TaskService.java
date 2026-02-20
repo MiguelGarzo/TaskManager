@@ -1,8 +1,7 @@
 package com.taskmanager.TaskManager.task.service;
 
-import com.taskmanager.TaskManager.comentary.dto.ComentResponseDTO;
-import com.taskmanager.TaskManager.comentary.entity.Comentary;
-import com.taskmanager.TaskManager.comentary.service.ComentaryService;
+import com.taskmanager.TaskManager.comentary.entity.Commentary;
+import com.taskmanager.TaskManager.comentary.repository.CommentaryRepository;
 import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.subtask.repository.SubtaskRepository;
 import com.taskmanager.TaskManager.task.dto.TaskRequestDTO;
@@ -25,16 +24,19 @@ public class TaskService {
     private final UserRepository uRepository;
     private final UserService uService;
     private final SubtaskRepository sRepository;
+    private final CommentaryRepository cRepository;
 
     public TaskService(TaskRepository tRepository,
                        UserRepository uRepository,
                        UserService uService,
-                       SubtaskRepository sRepository)
+                       SubtaskRepository sRepository,
+                       CommentaryRepository cRepository)
     {
         this.tRepository = tRepository;
         this.uRepository = uRepository;
         this.uService = uService;
         this.sRepository = sRepository;
+        this.cRepository = cRepository;
     }
 
     public TaskResponseDTO toResponse(Task task) {
@@ -44,7 +46,7 @@ public class TaskService {
         dto.setId(task.getId());
         dto.setBody(task.getBody());
         dto.setName(task.getName());
-        dto.setComentary(task.getComentary());
+        dto.setCommentary(task.getCommentary());
         dto.setOwner(task.getOwner());
         dto.setResponsible(task.getResponsible());
         dto.setInitDate(task.getInitDate());
@@ -148,28 +150,15 @@ public class TaskService {
 
     }
 
-    public void addSubtaskToTask(Long taskId, Long subtaskId) {
-        Task task = tRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
-
-        Subtask stask = sRepository.findById(subtaskId)
-                .orElseThrow(() -> new EntityNotFoundException("Subtask" + subtaskId + "not found"));
-
-        List<Subtask> subtasks = task.getSubtask();
-
-        subtasks.add(stask);
+    public void addSubtaskToTask(Task task, Subtask stask) {
+        task.getSubtask().add(stask);
     }
 
-    public void removeSubtaskFromTask(Long taskId, Long subtaskId) {
-        Task task = tRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
-
-        Subtask stask = sRepository.findById(subtaskId)
-                .orElseThrow(() -> new EntityNotFoundException("Subtask" + subtaskId + "not found"));
-
-        List<Subtask> subtasks = task.getSubtask();
-
-        subtasks.remove(stask);
+    public void removeSubtaskFromTask(Task task, Subtask stask) {
+        task.getSubtask().remove(stask);
     }
 
+    public void addComentToTask(Task task, Commentary comment) {
+        task.getCommentary().add(comment);
+    }
 }

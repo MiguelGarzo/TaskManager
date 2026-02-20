@@ -1,5 +1,6 @@
 package com.taskmanager.TaskManager.users.entity;
 
+import com.taskmanager.TaskManager.comentary.entity.Commentary;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.Role;
@@ -10,13 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -57,6 +53,9 @@ public class User {
 
     @OneToMany(mappedBy = "responsible", cascade = CascadeType.ALL)
     private List<Task> tasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Commentary> coments = new ArrayList<>();
 
 
 }
