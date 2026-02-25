@@ -1,9 +1,9 @@
-package com.taskmanager.TaskManager.comentary.service;
+package com.taskmanager.TaskManager.commentary.service;
 
-import com.taskmanager.TaskManager.comentary.dto.CommentRequestDTO;
-import com.taskmanager.TaskManager.comentary.dto.CommentResponseDTO;
-import com.taskmanager.TaskManager.comentary.entity.Commentary;
-import com.taskmanager.TaskManager.comentary.repository.CommentaryRepository;
+import com.taskmanager.TaskManager.commentary.dto.CommentRequestDTO;
+import com.taskmanager.TaskManager.commentary.dto.CommentResponseDTO;
+import com.taskmanager.TaskManager.commentary.entity.Commentary;
+import com.taskmanager.TaskManager.commentary.repository.CommentaryRepository;
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.task.repository.TaskRepository;
 import com.taskmanager.TaskManager.task.service.TaskService;

@@ -1,8 +1,8 @@
-package com.taskmanager.TaskManager.comentary.controller;
+package com.taskmanager.TaskManager.commentary.controller;
 
-import com.taskmanager.TaskManager.comentary.dto.CommentRequestDTO;
-import com.taskmanager.TaskManager.comentary.dto.CommentResponseDTO;
-import com.taskmanager.TaskManager.comentary.service.CommentaryService;
+import com.taskmanager.TaskManager.commentary.dto.CommentRequestDTO;
+import com.taskmanager.TaskManager.commentary.dto.CommentResponseDTO;
+import com.taskmanager.TaskManager.commentary.service.CommentaryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

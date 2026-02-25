@@ -1,6 +1,6 @@
 package com.taskmanager.TaskManager.users.entity;
 
-import com.taskmanager.TaskManager.comentary.entity.Commentary;
+import com.taskmanager.TaskManager.commentary.entity.Commentary;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.Role;

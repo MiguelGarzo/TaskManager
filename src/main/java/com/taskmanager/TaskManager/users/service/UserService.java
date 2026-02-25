@@ -1,8 +1,8 @@
 package com.taskmanager.TaskManager.users.service;
 
-import com.taskmanager.TaskManager.comentary.entity.Commentary;
-import com.taskmanager.TaskManager.comentary.repository.CommentaryRepository;
-import com.taskmanager.TaskManager.comentary.service.CommentaryService;
+import com.taskmanager.TaskManager.commentary.entity.Commentary;
+import com.taskmanager.TaskManager.commentary.repository.CommentaryRepository;
+import com.taskmanager.TaskManager.commentary.service.CommentaryService;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.company.service.CompanyService;
@@ -18,7 +18,6 @@ import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.TransactionScoped;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

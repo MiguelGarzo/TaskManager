@@ -1,4 +1,4 @@
-package com.taskmanager.TaskManager.comentary.dto;
+package com.taskmanager.TaskManager.commentary.dto;
 
 import com.taskmanager.TaskManager.task.entity.Task;
 import lombok.Getter;

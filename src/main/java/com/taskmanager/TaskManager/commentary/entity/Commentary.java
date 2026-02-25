@@ -1,4 +1,4 @@
-package com.taskmanager.TaskManager.comentary.entity;
+package com.taskmanager.TaskManager.commentary.entity;
 
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.entity.User;
