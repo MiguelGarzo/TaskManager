@@ -14,11 +14,10 @@ public class TaskRequestDTO {
 
     private String name;
     private String body;
-    private User responsible;
+    private String responsibleUsername;
     private Date initDate;
     private Date finishDate;
     private TaskStatus status;
     private Priority priority;
-    private User resposible;
 
 }

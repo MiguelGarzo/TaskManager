@@ -71,14 +71,14 @@ public class TaskService {
         Task task = new Task();
         task.setBody(dto.getBody());
         task.setName(dto.getName());
-        task.setResponsible(dto.getResponsible());
         task.setInitDate(dto.getInitDate());
         task.setFinishDate(dto.getFinishDate());
         task.setPriority(dto.getPriority());
         task.setStatus(dto.getStatus());
-        task.setResponsible(dto.getResponsible());
 
-        User responsible = dto.getResponsible();
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+        task.setResponsible(responsible);
         uService.addTaskToList(task, responsible);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -124,14 +124,14 @@ public class TaskService {
 
         task.setBody(dto.getBody());
         task.setName(dto.getName());
-        task.setResponsible(dto.getResponsible());
         task.setInitDate(dto.getInitDate());
         task.setFinishDate(dto.getFinishDate());
         task.setPriority(dto.getPriority());
         task.setStatus(dto.getStatus());
-        task.setResponsible(dto.getResponsible());
 
-        User responsible = dto.getResponsible();
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        task.setResponsible(responsible);
         uService.addTaskToList(task, responsible);
 
         return toResponse(task);
