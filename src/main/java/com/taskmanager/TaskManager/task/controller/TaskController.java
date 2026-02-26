@@ -36,7 +36,7 @@ public class TaskController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{username}")
+    @GetMapping("/by-user/{username}")
     public ResponseEntity<List<TaskResponseDTO>> tasksByUser(@PathVariable String username) {
         return ResponseEntity.ok(tService.tasksByUser(username));
     }

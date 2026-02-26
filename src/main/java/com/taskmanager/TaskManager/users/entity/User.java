@@ -20,7 +20,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Table(name = "users",
+uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username", "company_id"})
+    }
+)
 public class User {
 
     @Id
@@ -32,7 +36,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Username can't be empty")
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String username;
 
     @NotBlank(message = "Password can't be empty")
@@ -55,7 +59,7 @@ public class User {
     private List<Task> tasks = new ArrayList<>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Commentary> coments = new ArrayList<>();
+    private List<Commentary> comments = new ArrayList<>();
 
 
 }

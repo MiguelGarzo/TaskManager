@@ -47,7 +47,7 @@ public class CommentaryService {
         comment.setTask(dto.getTask());
 
         tService.addComentToTask(comment.getTask(), comment);
-        comment.getOwner().getComents().add(comment);
+        comment.getOwner().getComments().add(comment);
         commentRepository.save(comment);
 
         return toResponse(comment);
@@ -75,7 +75,7 @@ public class CommentaryService {
         Commentary comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("Coment not found"));
 
-        comment.getOwner().getComents().remove(comment);
+        comment.getOwner().getComments().remove(comment);
 
         commentRepository.delete(comment);
     }

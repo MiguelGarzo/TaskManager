@@ -6,6 +6,7 @@ import com.taskmanager.TaskManager.users.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -15,8 +16,8 @@ public class TaskRequestDTO {
     private String name;
     private String body;
     private String responsibleUsername;
-    private Date initDate;
-    private Date finishDate;
+    private LocalDateTime initDate;
+    private LocalDateTime finishDate;
     private TaskStatus status;
     private Priority priority;
 

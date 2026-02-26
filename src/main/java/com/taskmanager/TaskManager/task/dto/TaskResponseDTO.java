@@ -8,6 +8,7 @@ import com.taskmanager.TaskManager.users.entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,11 +21,11 @@ public class TaskResponseDTO {
     private String name;
     private String body;
     private List<Commentary> commentary = new ArrayList<>();
-    private User owner;
-    private User responsible;
+    private String ownerUsername;
+    private String responsibleUsername;
     private List<Subtask> subtask = new ArrayList<>();
-    private Date initDate;
-    private Date finishDate;
+    private LocalDateTime initDate;
+    private LocalDateTime finishDate;
     private TaskStatus status;
     private Priority priority;
 

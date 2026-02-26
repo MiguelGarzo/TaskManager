@@ -42,13 +42,12 @@ public class TaskService {
     public TaskResponseDTO toResponse(Task task) {
 
         TaskResponseDTO dto = new TaskResponseDTO();
-        dto.setResponsible(task.getResponsible());
         dto.setId(task.getId());
         dto.setBody(task.getBody());
         dto.setName(task.getName());
         dto.setCommentary(task.getCommentary());
-        dto.setOwner(task.getOwner());
-        dto.setResponsible(task.getResponsible());
+        dto.setOwnerUsername(task.getOwner().getUsername());
+        dto.setResponsibleUsername(task.getResponsible().getUsername());
         dto.setInitDate(task.getInitDate());
         dto.setFinishDate(task.getFinishDate());
         dto.setPriority(task.getPriority());
@@ -67,7 +66,6 @@ public class TaskService {
     }
 
     public TaskResponseDTO createTask(TaskRequestDTO dto) {
-
         Task task = new Task();
         task.setBody(dto.getBody());
         task.setName(dto.getName());
@@ -77,17 +75,18 @@ public class TaskService {
         task.setStatus(dto.getStatus());
 
         User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new RuntimeException("User" + dto.getResponsibleUsername() + "not found"));
         task.setResponsible(responsible);
-        uService.addTaskToList(task, responsible);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("Username: " + username);
         User owner = uRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
 
         task.setOwner(owner);
 
         tRepository.save(task);
+        uService.addTaskToList(task, responsible);
 
         return toResponse(task);
 

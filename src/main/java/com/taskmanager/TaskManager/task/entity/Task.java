@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,8 +60,8 @@ public class Task {
     private List<Subtask> subtask = new ArrayList<>();
 
     @NotNull
-    private Date initDate;
+    private LocalDateTime initDate;
     @NotNull
-    private Date finishDate;
+    private LocalDateTime finishDate;
 
 }
