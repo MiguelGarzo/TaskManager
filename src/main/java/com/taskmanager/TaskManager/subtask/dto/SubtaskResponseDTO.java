@@ -12,9 +12,9 @@ public class SubtaskResponseDTO {
     private Long subtaskId;
     private String name;
     private String body;
-    private Task task;
-    private User owner;
-    private User responsible;
+    private Long taskId;
+    private String ownerUsername;
+    private String responsibleUsername;
     private Boolean completed;
 
 }

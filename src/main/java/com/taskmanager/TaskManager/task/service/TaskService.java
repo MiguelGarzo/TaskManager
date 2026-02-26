@@ -79,7 +79,6 @@ public class TaskService {
         task.setResponsible(responsible);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("Username: " + username);
         User owner = uRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
 

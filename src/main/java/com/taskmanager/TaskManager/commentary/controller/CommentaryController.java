@@ -18,7 +18,7 @@ public class CommentaryController {
         this.commentService = commentaryService;
     }
 
-    @GetMapping("/{taskId}")
+    @GetMapping("/task/{taskId}")
     public ResponseEntity<List<CommentResponseDTO>> getAllCommentsByTask(@PathVariable Long taskId) {
         return ResponseEntity.ok(commentService.getTaskComments(taskId));
     }

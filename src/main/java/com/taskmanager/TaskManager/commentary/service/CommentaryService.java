@@ -7,8 +7,11 @@ import com.taskmanager.TaskManager.commentary.repository.CommentaryRepository;
 import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.task.repository.TaskRepository;
 import com.taskmanager.TaskManager.task.service.TaskService;
+import com.taskmanager.TaskManager.users.entity.User;
+import com.taskmanager.TaskManager.users.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,23 +23,27 @@ public class CommentaryService {
     private final CommentaryRepository commentRepository;
     private final TaskRepository tRepository;
     private final TaskService tService;
+    private final UserRepository uRepository;
 
     public CommentaryService(CommentaryRepository commentRepository,
                              TaskRepository tRepository,
-                             TaskService tService)
+                             TaskService tService,
+                             UserRepository uRepository)
     {
         this.commentRepository = commentRepository;
         this.tRepository = tRepository;
         this.tService = tService;
+        this.uRepository = uRepository;
     }
 
     public CommentResponseDTO toResponse(Commentary commentary) {
 
-        CommentResponseDTO newComent = new CommentResponseDTO();
-        newComent.setCommentary(commentary.getCommentary());
-        newComent.setTask(commentary.getTask());
+        CommentResponseDTO newComment = new CommentResponseDTO();
+        newComment.setCommentary(commentary.getCommentary());
+        newComment.setTaskId(commentary.getTask().getId());
+        newComment.setCommentId(commentary.getId());
 
-        return newComent;
+        return newComment;
 
     }
 
@@ -44,7 +51,16 @@ public class CommentaryService {
 
         Commentary comment = new Commentary();
         comment.setCommentary(dto.getCommentary());
-        comment.setTask(dto.getTask());
+
+        Task task = tRepository.findById(dto.getTaskId())
+                        .orElseThrow(() -> new EntityNotFoundException("Task " + dto.getTaskId() + " not found"));
+
+        comment.setTask(task);
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        User owner = uRepository.findByUsername(username)
+                        .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
+        comment.setOwner(owner);
 
         tService.addComentToTask(comment.getTask(), comment);
         comment.getOwner().getComments().add(comment);

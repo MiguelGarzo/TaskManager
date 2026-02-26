@@ -10,6 +10,6 @@ public class CommentResponseDTO {
 
     private Long commentId;
     private String commentary;
-    private Task task;
+    private Long taskId;
 
 }

@@ -39,10 +39,10 @@ public class SubtaskController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping()
-    public ResponseEntity<SubtaskResponseDTO> editSubtask(@RequestBody SubtaskRequestDTO dto) {
+    @PutMapping("/{subtaskId}")
+    public ResponseEntity<SubtaskResponseDTO> editSubtask(@PathVariable Long subtaskId, @RequestBody SubtaskRequestDTO dto) {
 
-        return ResponseEntity.ok(sService.editSubtask(dto));
+        return ResponseEntity.ok(sService.editSubtask(subtaskId, dto));
 
     }
 

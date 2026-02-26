@@ -9,6 +9,6 @@ import lombok.Setter;
 public class CommentRequestDTO {
 
     private String commentary;
-    private Task task;
+    private Long taskId;
 
 }

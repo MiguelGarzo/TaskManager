@@ -5,15 +5,7 @@ import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.task.Priority;
 import com.taskmanager.TaskManager.task.TaskStatus;
 import com.taskmanager.TaskManager.users.entity.User;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -42,8 +34,10 @@ public class Task {
     @NotNull
     private String body;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private TaskStatus status;
     @NotNull
+    @Enumerated(EnumType.STRING)
     private Priority priority;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
