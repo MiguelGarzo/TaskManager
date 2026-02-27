@@ -13,9 +13,11 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+    private final Long companyId;
 
     public CustomUserDetails(User user) {
         this.user = user;
+        this.companyId = user.getCompany().getId();
     }
 
     @Override
@@ -56,4 +58,6 @@ public class CustomUserDetails implements UserDetails {
     public User getUser() {
         return user;
     }
+
+    public Long getCompanyId() { return companyId; }
 }

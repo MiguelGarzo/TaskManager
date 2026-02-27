@@ -9,6 +9,7 @@ import com.taskmanager.TaskManager.task.repository.TaskRepository;
 import com.taskmanager.TaskManager.task.service.TaskService;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
+import com.taskmanager.TaskManager.users.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,20 +21,23 @@ import java.util.List;
 @Transactional
 public class SubtaskService {
 
-    private SubtaskRepository sRepository;
-    private UserRepository uRepository;
-    private TaskRepository tRepository;
-    private TaskService tService;
+    private final SubtaskRepository sRepository;
+    private final UserRepository uRepository;
+    private final TaskRepository tRepository;
+    private final TaskService tService;
+    private final UserService uService;
 
     public SubtaskService(SubtaskRepository sRepository,
                           UserRepository uRepository,
                           TaskRepository tRepository,
-                          TaskService tService)
+                          TaskService tService,
+                          UserService uService)
     {
         this.sRepository = sRepository;
         this.uRepository = uRepository;
         this.tRepository = tRepository;
         this.tService = tService;
+        this.uService = uService;
     }
 
     public SubtaskResponseDTO toResponse(Subtask stask) {
@@ -51,7 +55,8 @@ public class SubtaskService {
     }
 
     public SubtaskResponseDTO getSubtask(Long subtaskId) {
-        Subtask stask = sRepository.findById(subtaskId)
+        Long companyId = uService.getCurrentCompanyId();
+        Subtask stask = sRepository.findByIdAndCompanyId(subtaskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
         return toResponse(stask);
@@ -59,22 +64,24 @@ public class SubtaskService {
 
     public SubtaskResponseDTO createSubtask(SubtaskRequestDTO dto) {
 
+        Long companyId = uService.getCurrentCompanyId();
+
         Subtask stask = new Subtask();
         stask.setBody(dto.getBody());
         stask.setName(dto.getName());
         stask.setCompleted(false);
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Username " + dto.getResponsibleUsername() + " not found"));
         stask.setResponsible(responsible);
 
         String ownerUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User owner = uRepository.findByUsername(ownerUsername)
+        User owner = uRepository.findByUsername(ownerUsername, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User " + ownerUsername + " not found"));
         stask.setOwner(owner);
 
         Long taskId = dto.getTaskId();
-        Task task = tRepository.findById(taskId)
+        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task " + taskId + " not found"));
         stask.setTask(task);
 
@@ -86,7 +93,10 @@ public class SubtaskService {
     }
 
     public void markAsCompleted(Long subtaskId) {
-        Subtask stask = sRepository.findById(subtaskId)
+
+        Long companyId = uService.getCurrentCompanyId();
+
+        Subtask stask = sRepository.findByIdAndCompanyId(subtaskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
         stask.setCompleted(true);
@@ -94,20 +104,22 @@ public class SubtaskService {
 
     public SubtaskResponseDTO editSubtask(Long subtaskId, SubtaskRequestDTO dto) {
 
-        Subtask stask = sRepository.findById(subtaskId)
+        Long companyId = uService.getCurrentCompanyId();
+
+        Subtask stask = sRepository.findByIdAndCompanyId(subtaskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
         stask.setName(dto.getName());
         stask.setBody(dto.getBody());
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
                         .orElseThrow(() -> new EntityNotFoundException("User not found"));
         stask.setResponsible(responsible);
 
-        Task previousTask = tRepository.findById(stask.getTask().getId())
+        Task previousTask = tRepository.findByIdAndCompanyId(stask.getTask().getId(), companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
-        Task task = tRepository.findById(dto.getTaskId())
+        Task task = tRepository.findByIdAndCompanyId(dto.getTaskId(), companyId)
                         .orElseThrow(() -> new EntityNotFoundException("Task not found"));
         stask.setTask(task);
 
@@ -119,7 +131,10 @@ public class SubtaskService {
     }
 
     public void removeSubtask(Long subtaskId) {
-        Subtask stask = sRepository.findById(subtaskId)
+
+        Long companyId = uService.getCurrentCompanyId();
+
+        Subtask stask = sRepository.findByIdAndCompanyId(subtaskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
         sRepository.delete(stask);
@@ -127,7 +142,9 @@ public class SubtaskService {
 
     public List<SubtaskResponseDTO> getSubtasksByTask(Long taskId) {
 
-        Task task = tRepository.findById(taskId)
+        Long companyId = uService.getCurrentCompanyId();
+
+        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
         List<Subtask> subtasks = task.getSubtask();

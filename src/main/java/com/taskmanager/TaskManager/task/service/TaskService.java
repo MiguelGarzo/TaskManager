@@ -58,7 +58,9 @@ public class TaskService {
 
     public TaskResponseDTO getTaskById(Long taskId) {
 
-        Task task = tRepository.findById(taskId)
+        Long companyId = uService.getCurrentCompanyId();
+
+        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
         return toResponse(task);
@@ -74,12 +76,14 @@ public class TaskService {
         task.setPriority(dto.getPriority());
         task.setStatus(dto.getStatus());
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+        Long companyId = uService.getCurrentCompanyId();
+
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
                         .orElseThrow(() -> new RuntimeException("User" + dto.getResponsibleUsername() + "not found"));
         task.setResponsible(responsible);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User owner = uRepository.findByUsername(username)
+        User owner = uRepository.findByUsername(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
 
         task.setOwner(owner);
@@ -94,8 +98,9 @@ public class TaskService {
     public List<TaskResponseDTO> userTasks() {
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long companyId = uService.getCurrentCompanyId();
 
-        User user = uRepository.findByUsername(username)
+        User user = uRepository.findByUsername(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();
@@ -105,7 +110,10 @@ public class TaskService {
     }
 
     public List<TaskResponseDTO> tasksByUser(String username) {
-        User user = uRepository.findByUsername(username)
+
+        Long companyId = uService.getCurrentCompanyId();
+
+        User user = uRepository.findByUsername(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();
@@ -114,7 +122,10 @@ public class TaskService {
     }
 
     public TaskResponseDTO editTask(Long taskId, TaskRequestDTO dto) {
-        Task task = tRepository.findById(taskId)
+
+        Long companyId = uService.getCurrentCompanyId();
+
+        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
 
         User previousResponsible = task.getResponsible();
@@ -127,7 +138,7 @@ public class TaskService {
         task.setPriority(dto.getPriority());
         task.setStatus(dto.getStatus());
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername())
+        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         task.setResponsible(responsible);
         uService.addTaskToList(task, responsible);
@@ -138,7 +149,9 @@ public class TaskService {
 
     public void removeTask(Long taskId) {
 
-        Task task = tRepository.findById(taskId)
+        Long companyId = uService.getCurrentCompanyId();
+
+        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
 
         User user = task.getResponsible();

@@ -36,13 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        // Si no hay token o no empieza con "Bearer ", no hacemos nada, dejamos pasar
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwt = authHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (Exception e) {
-                // Token inválido, ignoramos y dejamos pasar para que Spring decida si es público o no
+
             }
         }
 

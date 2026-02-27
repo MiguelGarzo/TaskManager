@@ -72,15 +72,20 @@ public class UserService {
         return dto;
     }
 
+    public Long getCurrentCompanyId() {
+        CustomUserDetails userDetails =
+                (CustomUserDetails) SecurityContextHolder
+                        .getContext().getAuthentication().getPrincipal();
+
+        return userDetails.getCompanyId();
+    }
+
     public List<UserResponseDTO> getAllCompanyUsers() {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        User user = uRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
-        Long companyId = user.getCompany().getId();
+        Long companyId = getCurrentCompanyId();
 
         return uRepository.findByCompanyId(companyId).stream().map(this::toResponse).collect(Collectors.toList());
     }
@@ -96,7 +101,9 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
 
-        User cUser = uRepository.findByUsername(username)
+        Long companyId = getCurrentCompanyId();
+
+        User cUser = uRepository.findByUsername(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         Company company = cUser.getCompany();
@@ -144,7 +151,8 @@ public class UserService {
     public UserResponseDTO upgradeUser(){
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = uRepository.findByUsername(username)
+        Long companyId = getCurrentCompanyId();
+        User user = uRepository.findByUsername(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         //Falta el codigo de Stripe
