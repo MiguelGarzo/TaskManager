@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface CommentaryRepository extends JpaRepository<Commentary, Long> {
-    Optional<Commentary> findById(Long ComentId);
+    Optional<Commentary> findByIdAndCompanyId(Long commentId, Long companyId);
 }
