@@ -1,5 +1,6 @@
 package com.taskmanager.TaskManager.upgrade;
 
+import com.stripe.exception.StripeException;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

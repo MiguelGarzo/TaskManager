@@ -80,11 +80,14 @@ public class UserService {
         return userDetails.getCompanyId();
     }
 
+    private User getCurrentUser() {
+        Long companyId = getCurrentCompanyId();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return uRepository.findByUsername(username, companyId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
+
     public List<UserResponseDTO> getAllCompanyUsers() {
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
         Long companyId = getCurrentCompanyId();
 
         return uRepository.findByCompanyId(companyId).stream().map(this::toResponse).collect(Collectors.toList());
@@ -98,20 +101,11 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus(Status.NORMAL);
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        Long companyId = getCurrentCompanyId();
-
-        User cUser = uRepository.findByUsername(username, companyId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+        User cUser = getCurrentUser();
         Company company = cUser.getCompany();
-
         user.setCompany(company);
 
         uRepository.save(user);
-
         cService.addUserToCompany(user);
 
         return toResponse(user);
@@ -136,13 +130,13 @@ public class UserService {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        dto.getUsername(),
+                        dto.getEmail(),
                         dto.getPassword()
                 )
         );
 
         CustomUserDetails userDetails =
-                (CustomUserDetails) customUserDetailsService.loadUserByUsername(dto.getUsername());
+                (CustomUserDetails) customUserDetailsService.loadUserByUsername(dto.getEmail());
 
         return jwtUtil.tokenGen(userDetails);
 
