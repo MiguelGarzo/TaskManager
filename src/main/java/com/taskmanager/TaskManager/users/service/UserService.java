@@ -1,8 +1,6 @@
 package com.taskmanager.TaskManager.users.service;
 
-import com.taskmanager.TaskManager.commentary.entity.Commentary;
 import com.taskmanager.TaskManager.commentary.repository.CommentaryRepository;
-import com.taskmanager.TaskManager.commentary.service.CommentaryService;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.company.service.CompanyService;
@@ -21,7 +19,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -144,16 +141,13 @@ public class UserService {
 
     public UserResponseDTO upgradeUser(){
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long companyId = getCurrentCompanyId();
-        User user = uRepository.findByUsername(username, companyId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User cUser = getCurrentUser();
 
         //Falta el codigo de Stripe
 
-        user.setStatus(Status.PREMIUM);
+        cUser.setStatus(Status.PREMIUM);
 
-        return toResponse(user);
+        return toResponse(cUser);
     }
 
     public void addTaskToList(Task task, User user) {
