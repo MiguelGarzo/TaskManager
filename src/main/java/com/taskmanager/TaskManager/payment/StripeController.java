@@ -20,6 +20,7 @@ public class StripeController {
             stripeWebhookService.processWebhook(payload, sigHeader);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body("Webhook error");
         }
     }

@@ -1,5 +1,6 @@
 package com.taskmanager.TaskManager.payment;
 
+import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -36,15 +37,18 @@ public class StripeWebhookService {
                     Session session = (Session) event.getDataObjectDeserializer().getObject().orElseThrow(() -> new RuntimeException("Failed to deserialize session"));
 
                     String subscriptionId = session.getSubscription();
+                    String customerId = session.getCustomer();
                     String customerEmail = session.getCustomerEmail();
 
-                    Subscription subscription = (Subscription) event.getDataObjectDeserializer()
-                            .getObject()
-                            .orElseThrow(() -> new RuntimeException("Failed to deserialize subscription"));
+                    try{
+                        Subscription subscription = Subscription.retrieve(subscriptionId);
 
-                    Long periodEnd = subscription.getRawJsonObject().get("current_period_end").getAsLong();
-
-                    userService.activateSubscription(customerEmail, subscriptionId, periodEnd);
+                        Long periodEnd = subscription.getItems().getData().get(0).getCurrentPeriodEnd();
+                        System.out.println("Webhook recibido para " + customerEmail + " subs " + subscriptionId);
+                        userService.activateSubscription(customerEmail, customerId, subscriptionId, periodEnd);
+                    } catch (StripeException e) {
+                        throw new RuntimeException("Error retrieving subscription from Stripe", e);
+                    }
                     break;
 
                 case "invoice.paid":

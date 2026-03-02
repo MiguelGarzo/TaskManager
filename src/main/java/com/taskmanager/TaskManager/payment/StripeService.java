@@ -1,5 +1,6 @@
 package com.taskmanager.TaskManager.payment;
 
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
@@ -11,10 +12,15 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StripeService {
 
+    @Value("${stripe.secret.key}")
+    private String secretKey;
+
     @Value("${stripe.price.id}")
     private String priceId;
 
     public String createUpgradeSession(String userEmail) throws StripeException {
+
+        Stripe.apiKey = secretKey;
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)

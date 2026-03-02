@@ -25,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,9 +62,8 @@ public class UserService {
     }
 
     public User getCurrentUser() {
-        Long companyId = getCurrentCompanyId();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return uRepository.findByUsername(username, companyId)
+        return uRepository.findByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
     }
 
@@ -130,28 +130,52 @@ public class UserService {
 
     }
 
-    public void activateSubscription(String email, String subscriptionId, Long currentPeriodEnd) {
+    public void activateSubscription(String email, String customerId, String subscriptionId, Long currentPeriodEnd) {
         User user = uRepository.findByEmail(email).orElseThrow();
+
+        user.setStripeCustomerId(customerId);
         user.setStripeSubscriptionId(subscriptionId);
-        user.setStatus(Status.PREMIUM);
-        user.setSubscriptionStatus("ACTIVE");
         user.setCurrentPeriodEnd(currentPeriodEnd);
+
         uRepository.save(user);
     }
 
     public void updateSubscription(String stripeCustomerId, Long periodEnd, String status) {
-        User user = uRepository.findByStripeCustomerId(stripeCustomerId).orElseThrow();
+        Optional<User> oUser = uRepository.findByStripeCustomerId(stripeCustomerId);
+
+        if (oUser.isEmpty()) {
+            System.out.println("Usuario no encontrado aún para customerId: " + stripeCustomerId);
+            return;
+        }
+
+        User user = oUser.get();
         user.setCurrentPeriodEnd(periodEnd);
         user.setSubscriptionStatus(status);
-        user.setStatus(Status.PREMIUM);
+
+        if ("ACTIVE".equals(status)) {
+            user.setStatus(Status.PREMIUM);
+        } else if ("PAST_DUE".equals(status)) {
+            user.setStatus(Status.NORMAL);
+        }
+
         uRepository.save(user);
     }
 
     public void updateSubscriptionStatus(String stripeCustomerId, String status) {
-        User user = uRepository.findByStripeCustomerId(stripeCustomerId).orElseThrow();
+        Optional<User> oUser = uRepository.findByStripeCustomerId(stripeCustomerId);
+
+        if (oUser.isEmpty()) {
+            System.out.println("Usuario no encontrado aún para customerId: " + stripeCustomerId);
+            return;
+        }
+
+        User user = oUser.get();
         user.setSubscriptionStatus(status);
+
         if ("PAST_DUE".equals(status)) {
             user.setStatus(Status.NORMAL);
+        } else if ("ACTIVE".equals(status)) {
+            user.setStatus(Status.PREMIUM);
         }
         uRepository.save(user);
     }
