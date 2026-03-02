@@ -13,5 +13,6 @@ public class UserResponseDTO {
     private String email;
     private Status status;
     private Role role;
+    private Long currentPeriodEnd;
 
 }

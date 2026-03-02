@@ -60,7 +60,7 @@ public class TaskService {
 
         Long companyId = uService.getCurrentCompanyId();
 
-        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
+        Task task = tRepository.findByIdAndOwner_Company_Id(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task not found"));
 
         return toResponse(task);
@@ -125,7 +125,7 @@ public class TaskService {
 
         Long companyId = uService.getCurrentCompanyId();
 
-        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
+        Task task = tRepository.findByIdAndOwner_Company_Id(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
 
         User previousResponsible = task.getResponsible();
@@ -151,7 +151,7 @@ public class TaskService {
 
         Long companyId = uService.getCurrentCompanyId();
 
-        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
+        Task task = tRepository.findByIdAndOwner_Company_Id(taskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Task" + taskId + "not found"));
 
         User user = task.getResponsible();

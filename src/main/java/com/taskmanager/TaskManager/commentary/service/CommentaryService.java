@@ -12,6 +12,7 @@ import com.taskmanager.TaskManager.users.repository.UserRepository;
 import com.taskmanager.TaskManager.users.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.List;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class CommentaryService {
 
     private final CommentaryRepository commentRepository;
@@ -26,19 +28,6 @@ public class CommentaryService {
     private final TaskService tService;
     private final UserRepository uRepository;
     private final UserService uService;
-
-    public CommentaryService(CommentaryRepository commentRepository,
-                             TaskRepository tRepository,
-                             TaskService tService,
-                             UserRepository uRepository,
-                             UserService uService)
-    {
-        this.commentRepository = commentRepository;
-        this.tRepository = tRepository;
-        this.tService = tService;
-        this.uRepository = uRepository;
-        this.uService = uService;
-    }
 
     public CommentResponseDTO toResponse(Commentary commentary) {
 
@@ -58,7 +47,7 @@ public class CommentaryService {
         Commentary comment = new Commentary();
         comment.setCommentary(dto.getCommentary());
 
-        Task task = tRepository.findByIdAndCompanyId(dto.getTaskId(), companyId)
+        Task task = tRepository.findByIdAndOwner_Company_Id(dto.getTaskId(), companyId)
                         .orElseThrow(() -> new EntityNotFoundException("Task " + dto.getTaskId() + " not found"));
 
         comment.setTask(task);
@@ -77,7 +66,7 @@ public class CommentaryService {
 
     public List<CommentResponseDTO> getTaskComments(Long taskId) {
         Long companyId = uService.getCurrentCompanyId();
-        Task task = tRepository.findByIdAndCompanyId(taskId, companyId)
+        Task task = tRepository.findByIdAndOwner_Company_Id(taskId, companyId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         return task.getCommentary().stream().map(this::toResponse).toList();
@@ -86,7 +75,7 @@ public class CommentaryService {
 
     public CommentResponseDTO editBody(Long commentId, CommentRequestDTO dto) {
         Long companyId = uService.getCurrentCompanyId();
-        Commentary comment = commentRepository.findByIdAndCompanyId(commentId, companyId)
+        Commentary comment = commentRepository.findByIdAndOwner_Company_Id(commentId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Coment not found"));
 
         comment.setCommentary(dto.getCommentary());
@@ -96,7 +85,7 @@ public class CommentaryService {
 
     public void removeComment(Long commentId) {
         Long companyId = uService.getCurrentCompanyId();
-        Commentary comment = commentRepository.findByIdAndCompanyId(commentId, companyId)
+        Commentary comment = commentRepository.findByIdAndOwner_Company_Id(commentId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Coment not found"));
 
         comment.getOwner().getComments().remove(comment);

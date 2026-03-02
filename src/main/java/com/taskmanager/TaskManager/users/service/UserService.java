@@ -17,6 +17,7 @@ import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository uRepository;
@@ -39,32 +41,13 @@ public class UserService {
     private final CompanyService cService;
     private final CommentaryRepository commentaryRepository;
 
-    public UserService (UserRepository uRepository,
-                        PasswordEncoder passwordEncoder,
-                        CompanyRepository cRepository,
-                        JwtUtil jwtUtil,
-                        CustomUserDetailsService customUserDetailsService,
-                        AuthenticationManager authenticationManager,
-                        CompanyService cService,
-                        CommentaryRepository commentaryRepository
-                        )
-    {
-        this.uRepository = uRepository;
-        this.cRepository = cRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-        this.customUserDetailsService = customUserDetailsService;
-        this.authenticationManager = authenticationManager;
-        this.cService = cService;
-        this.commentaryRepository = commentaryRepository;
-    }
-
     public UserResponseDTO toResponse(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         dto.setStatus(user.getStatus());
         dto.setRole(user.getRole());
+        dto.setCurrentPeriodEnd(user.getCurrentPeriodEnd());
 
         return dto;
     }
@@ -77,7 +60,7 @@ public class UserService {
         return userDetails.getCompanyId();
     }
 
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         Long companyId = getCurrentCompanyId();
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return uRepository.findByUsername(username, companyId)
@@ -97,6 +80,10 @@ public class UserService {
         user.setRole(dto.getRole());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setStatus(Status.NORMAL);
+        user.setStripeCustomerId(null);
+        user.setStripeSubscriptionId(null);
+        user.setSubscriptionStatus("NONE");
+        user.setCurrentPeriodEnd(null);
 
         User cUser = getCurrentUser();
         Company company = cUser.getCompany();
@@ -116,6 +103,10 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(autDTO.getPassword()));
         user.setStatus(Status.NORMAL);
         user.setCompany(autDTO.getCompany());
+        user.setStripeCustomerId(null);
+        user.setStripeSubscriptionId(null);
+        user.setSubscriptionStatus("NONE");
+        user.setCurrentPeriodEnd(null);
 
         uRepository.save(user);
         cService.addUserToCompany(user);
@@ -139,15 +130,38 @@ public class UserService {
 
     }
 
-    public UserResponseDTO upgradeUser(){
+    public void activateSubscription(String email, String subscriptionId, Long currentPeriodEnd) {
+        User user = uRepository.findByEmail(email).orElseThrow();
+        user.setStripeSubscriptionId(subscriptionId);
+        user.setStatus(Status.PREMIUM);
+        user.setSubscriptionStatus("ACTIVE");
+        user.setCurrentPeriodEnd(currentPeriodEnd);
+        uRepository.save(user);
+    }
 
-        User cUser = getCurrentUser();
+    public void updateSubscription(String stripeCustomerId, Long periodEnd, String status) {
+        User user = uRepository.findByStripeCustomerId(stripeCustomerId).orElseThrow();
+        user.setCurrentPeriodEnd(periodEnd);
+        user.setSubscriptionStatus(status);
+        user.setStatus(Status.PREMIUM);
+        uRepository.save(user);
+    }
 
-        //Falta el codigo de Stripe
+    public void updateSubscriptionStatus(String stripeCustomerId, String status) {
+        User user = uRepository.findByStripeCustomerId(stripeCustomerId).orElseThrow();
+        user.setSubscriptionStatus(status);
+        if ("PAST_DUE".equals(status)) {
+            user.setStatus(Status.NORMAL);
+        }
+        uRepository.save(user);
+    }
 
-        cUser.setStatus(Status.PREMIUM);
-
-        return toResponse(cUser);
+    public void downgradeUser(String stripeCustomerId) {
+        User user = uRepository.findByStripeCustomerId(stripeCustomerId).orElseThrow();
+        user.setStatus(Status.NORMAL);
+        user.setSubscriptionStatus("CANCELED");
+        user.setCurrentPeriodEnd(null);
+        uRepository.save(user);
     }
 
     public void addTaskToList(Task task, User user) {

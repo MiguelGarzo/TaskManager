@@ -47,6 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.POST, "/company/new").permitAll()
                     .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
+                    .requestMatchers("/stripe/webhook").permitAll()
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
