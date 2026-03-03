@@ -3,6 +3,8 @@ package com.taskmanager.TaskManager.company.controller;
 import com.taskmanager.TaskManager.company.dto.CompanyRequestDTO;
 import com.taskmanager.TaskManager.company.dto.CompanyResponseDTO;
 import com.taskmanager.TaskManager.company.service.CompanyService;
+import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
+import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,9 +32,9 @@ public class CompanyController {
     }
 
     @PostMapping("/new")
-    public ResponseEntity<CompanyResponseDTO> createCompany(@RequestBody CompanyRequestDTO dto) {
+    public ResponseEntity<CompanyResponseDTO> createCompany(@RequestBody CompanyRequestDTO dto, @RequestBody UserRegisterAutDTO uDto) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(cService.createCompany(dto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(cService.createCompany(dto, uDto));
 
     }
 }

@@ -46,7 +46,7 @@ public class CompanyService {
 
     }
 
-    public CompanyResponseDTO createCompany(CompanyRequestDTO dto) {
+    public CompanyResponseDTO createCompany(CompanyRequestDTO dto, UserRegisterAutDTO uDto) {
 
         if (cRepository.existsByName(dto.getName())) {
             throw new RuntimeException("Company name already exists: " + dto.getName());
@@ -59,9 +59,9 @@ public class CompanyService {
         cRepository.save(company);
 
         UserRegisterAutDTO user = new UserRegisterAutDTO();
-        user.setUsername("admin");
-        user.setPassword("admin");
-        user.setEmail("admin@example.com");
+        user.setUsername(uDto.getUsername());
+        user.setPassword(uDto.getPassword());
+        user.setEmail(uDto.getEmail());
         user.setRole(Role.ADMIN);
 
         user.setCompany(company);
