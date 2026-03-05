@@ -12,12 +12,14 @@ import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.repository.UserRepository;
 import com.taskmanager.TaskManager.users.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TaskService {
 
     private final TaskRepository tRepository;
@@ -25,19 +27,6 @@ public class TaskService {
     private final UserService uService;
     private final SubtaskRepository sRepository;
     private final CommentaryRepository cRepository;
-
-    public TaskService(TaskRepository tRepository,
-                       UserRepository uRepository,
-                       UserService uService,
-                       SubtaskRepository sRepository,
-                       CommentaryRepository cRepository)
-    {
-        this.tRepository = tRepository;
-        this.uRepository = uRepository;
-        this.uService = uService;
-        this.sRepository = sRepository;
-        this.cRepository = cRepository;
-    }
 
     public TaskResponseDTO toResponse(Task task) {
 
@@ -78,13 +67,13 @@ public class TaskService {
 
         Long companyId = uService.getCurrentCompanyId();
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
-                        .orElseThrow(() -> new RuntimeException("User" + dto.getResponsibleUsername() + "not found"));
+        User responsible = uRepository.findByUsernameAndCompany_Id(dto.getResponsibleUsername(), companyId)
+                        .orElseThrow(() -> new RuntimeException("User " + dto.getResponsibleUsername() + " not found"));
         task.setResponsible(responsible);
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User owner = uRepository.findByUsername(username, companyId)
-                .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User owner = uRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User " + email + " not found"));
 
         task.setOwner(owner);
 
@@ -100,7 +89,7 @@ public class TaskService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Long companyId = uService.getCurrentCompanyId();
 
-        User user = uRepository.findByUsername(username, companyId)
+        User user = uRepository.findByUsernameAndCompany_Id(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();
@@ -113,7 +102,7 @@ public class TaskService {
 
         Long companyId = uService.getCurrentCompanyId();
 
-        User user = uRepository.findByUsername(username, companyId)
+        User user = uRepository.findByUsernameAndCompany_Id(username, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();
@@ -138,7 +127,7 @@ public class TaskService {
         task.setPriority(dto.getPriority());
         task.setStatus(dto.getStatus());
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
+        User responsible = uRepository.findByUsernameAndCompany_Id(dto.getResponsibleUsername(), companyId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         task.setResponsible(responsible);
         uService.addTaskToList(task, responsible);

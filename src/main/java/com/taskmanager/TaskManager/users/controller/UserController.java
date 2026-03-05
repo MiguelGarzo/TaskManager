@@ -50,10 +50,16 @@ public class UserController {
 
     @PatchMapping("/upgrade")
     public ResponseEntity<Map<String, String>> upgradeUser() throws StripeException {
-        User currentUser = service.getCurrentUser();
-        String checkoutUrl = stripeService.createUpgradeSession(currentUser.getEmail());
+        try{
+            User currentUser = service.getCurrentUser();
+            String checkoutUrl = stripeService.createUpgradeSession(currentUser.getEmail());
 
-        return ResponseEntity.ok(Map.of("url", checkoutUrl));
+            return ResponseEntity.ok(Map.of("url", checkoutUrl));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (StripeException e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error while creating stripe session"));
+        }
     }
 
 }

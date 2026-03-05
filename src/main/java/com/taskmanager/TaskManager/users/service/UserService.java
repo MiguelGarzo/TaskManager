@@ -10,7 +10,6 @@ import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.CustomUserDetailsService;
 import com.taskmanager.TaskManager.users.Status;
 import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
-import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
@@ -95,14 +94,14 @@ public class UserService {
         return toResponse(user);
     }
 
-    public UserResponseDTO createAutUser(UserRegisterAutDTO autDTO) {
+    public UserResponseDTO createAutUser(UserRegisterDTO autDTO, Company company) {
         User user = new User();
         user.setUsername(autDTO.getUsername());
         user.setEmail(autDTO.getEmail());
         user.setRole(autDTO.getRole());
         user.setPassword(passwordEncoder.encode(autDTO.getPassword()));
         user.setStatus(Status.NORMAL);
-        user.setCompany(autDTO.getCompany());
+        user.setCompany(company);
         user.setStripeCustomerId(null);
         user.setStripeSubscriptionId(null);
         user.setSubscriptionStatus("NONE");
@@ -140,42 +139,35 @@ public class UserService {
         uRepository.save(user);
     }
 
-    public void updateSubscription(String stripeCustomerId, Long periodEnd, String status) {
+    public void updateSubscription(String stripeCustomerId, String customerEmail,Long periodEnd, String status) {
         Optional<User> oUser = uRepository.findByStripeCustomerId(stripeCustomerId);
 
         if (oUser.isEmpty()) {
-            System.out.println("Usuario no encontrado aún para customerId: " + stripeCustomerId);
-            return;
+
+            Optional<User> userByEmail = uRepository.findByEmail(customerEmail);
+
+            if (userByEmail.isEmpty()) {
+                System.out.println("Usuario no encontrado aún para customerId: " + stripeCustomerId);
+                return;
+            }
+
+            User user = userByEmail.get();
+            user.setStripeCustomerId(stripeCustomerId);
+            oUser = Optional.of(user);
         }
 
         User user = oUser.get();
-        user.setCurrentPeriodEnd(periodEnd);
+
+        if (periodEnd != null) {
+            user.setCurrentPeriodEnd(periodEnd);
+        }
+
         user.setSubscriptionStatus(status);
 
         if ("ACTIVE".equals(status)) {
             user.setStatus(Status.PREMIUM);
         } else if ("PAST_DUE".equals(status)) {
             user.setStatus(Status.NORMAL);
-        }
-
-        uRepository.save(user);
-    }
-
-    public void updateSubscriptionStatus(String stripeCustomerId, String status) {
-        Optional<User> oUser = uRepository.findByStripeCustomerId(stripeCustomerId);
-
-        if (oUser.isEmpty()) {
-            System.out.println("Usuario no encontrado aún para customerId: " + stripeCustomerId);
-            return;
-        }
-
-        User user = oUser.get();
-        user.setSubscriptionStatus(status);
-
-        if ("PAST_DUE".equals(status)) {
-            user.setStatus(Status.NORMAL);
-        } else if ("ACTIVE".equals(status)) {
-            user.setStatus(Status.PREMIUM);
         }
         uRepository.save(user);
     }

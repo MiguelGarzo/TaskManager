@@ -52,9 +52,9 @@ public class CommentaryService {
 
         comment.setTask(task);
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User owner = uRepository.findByUsername(username, companyId)
-                        .orElseThrow(() -> new EntityNotFoundException("User " + username + " not found"));
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        User owner = uRepository.findByEmail(email)
+                        .orElseThrow(() -> new EntityNotFoundException("User " + email + " not found"));
         comment.setOwner(owner);
 
         tService.addComentToTask(comment.getTask(), comment);

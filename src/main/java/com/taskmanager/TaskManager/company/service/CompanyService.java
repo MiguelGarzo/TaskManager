@@ -2,10 +2,10 @@ package com.taskmanager.TaskManager.company.service;
 
 import com.taskmanager.TaskManager.company.dto.CompanyRequestDTO;
 import com.taskmanager.TaskManager.company.dto.CompanyResponseDTO;
+import com.taskmanager.TaskManager.company.dto.CreateCompanyDTO;
 import com.taskmanager.TaskManager.company.entity.Company;
 import com.taskmanager.TaskManager.company.repository.CompanyRepository;
 import com.taskmanager.TaskManager.users.Role;
-import com.taskmanager.TaskManager.users.dto.UserRegisterAutDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.entity.User;
 import com.taskmanager.TaskManager.users.service.UserService;
@@ -46,27 +46,25 @@ public class CompanyService {
 
     }
 
-    public CompanyResponseDTO createCompany(CompanyRequestDTO dto, UserRegisterAutDTO uDto) {
+    public CompanyResponseDTO createCompany(CreateCompanyDTO dto) {
 
-        if (cRepository.existsByName(dto.getName())) {
-            throw new RuntimeException("Company name already exists: " + dto.getName());
+        if (cRepository.existsByName(dto.getCompany().getName())) {
+            throw new RuntimeException("Company name already exists: " + dto.getCompany().getName());
         }
 
         Company company = new Company();
-        company.setName(dto.getName());
-        company.setAdress(dto.getAdress());
+        company.setName(dto.getCompany().getName());
+        company.setAdress(dto.getCompany().getAdress());
 
         cRepository.save(company);
 
-        UserRegisterAutDTO user = new UserRegisterAutDTO();
-        user.setUsername(uDto.getUsername());
-        user.setPassword(uDto.getPassword());
-        user.setEmail(uDto.getEmail());
+        UserRegisterDTO user = new UserRegisterDTO();
+        user.setUsername(dto.getUser().getUsername());
+        user.setPassword(dto.getUser().getPassword());
+        user.setEmail(dto.getUser().getEmail());
         user.setRole(Role.ADMIN);
 
-        user.setCompany(company);
-
-        uService.createAutUser(user);
+        uService.createAutUser(user, company);
 
         return toResponse(company);
 

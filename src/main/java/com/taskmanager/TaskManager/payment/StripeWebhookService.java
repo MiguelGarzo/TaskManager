@@ -53,12 +53,12 @@ public class StripeWebhookService {
 
                 case "invoice.paid":
                     Invoice invoice = (Invoice) event.getDataObjectDeserializer().getObject().orElseThrow();
-                    userService.updateSubscription(invoice.getCustomer(), invoice.getLines().getData().get(0).getPeriod().getEnd(), "ACTIVE");
+                    userService.updateSubscription(invoice.getCustomer(), invoice.getCustomerEmail(),invoice.getLines().getData().get(0).getPeriod().getEnd(), "ACTIVE");
                     break;
 
                 case "invoice.payment_failed":
                     Invoice failedInvoice = (Invoice) event.getDataObjectDeserializer().getObject().orElseThrow();
-                    userService.updateSubscriptionStatus(failedInvoice.getCustomer(), "PAST_DUE");
+                    userService.updateSubscription(failedInvoice.getCustomer(), failedInvoice.getCustomerEmail(), null, "PAST_DUE");
                     break;
 
                 case "customer.subscription.deleted":

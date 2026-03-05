@@ -60,13 +60,13 @@ public class SubtaskService {
         stask.setName(dto.getName());
         stask.setCompleted(false);
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
+        User responsible = uRepository.findByUsernameAndCompany_Id(dto.getResponsibleUsername(), companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Username " + dto.getResponsibleUsername() + " not found"));
         stask.setResponsible(responsible);
 
-        String ownerUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        User owner = uRepository.findByUsername(ownerUsername, companyId)
-                .orElseThrow(() -> new EntityNotFoundException("User " + ownerUsername + " not found"));
+        String ownerEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        User owner = uRepository.findByEmail(ownerEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User " + ownerEmail + " not found"));
         stask.setOwner(owner);
 
         Long taskId = dto.getTaskId();
@@ -101,7 +101,7 @@ public class SubtaskService {
         stask.setName(dto.getName());
         stask.setBody(dto.getBody());
 
-        User responsible = uRepository.findByUsername(dto.getResponsibleUsername(), companyId)
+        User responsible = uRepository.findByUsernameAndCompany_Id(dto.getResponsibleUsername(), companyId)
                         .orElseThrow(() -> new EntityNotFoundException("User not found"));
         stask.setResponsible(responsible);
 

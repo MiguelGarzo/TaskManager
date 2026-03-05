@@ -4,6 +4,10 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.taskmanager.TaskManager.users.Status;
+import com.taskmanager.TaskManager.users.controller.UserController;
+import com.taskmanager.TaskManager.users.entity.User;
+import com.taskmanager.TaskManager.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -12,15 +16,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class StripeService {
 
-    @Value("${stripe.secret.key}")
-    private String secretKey;
+    private final UserRepository uRepository;
 
     @Value("${stripe.price.id}")
     private String priceId;
 
     public String createUpgradeSession(String userEmail) throws StripeException {
 
-        Stripe.apiKey = secretKey;
+        User cUser = uRepository.findByEmail(userEmail).orElseThrow();
+
+        if (cUser.getStatus() == Status.PREMIUM) {
+            throw new IllegalStateException("Current user is already Premium");
+        }
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
