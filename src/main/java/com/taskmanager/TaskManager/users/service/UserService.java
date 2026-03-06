@@ -139,7 +139,7 @@ public class UserService {
         uRepository.save(user);
     }
 
-    public void updateSubscription(String stripeCustomerId, String customerEmail,Long periodEnd, String status) {
+    public void updateSubscription(String stripeCustomerId, String customerEmail, Long periodEnd, String status) {
         Optional<User> oUser = uRepository.findByStripeCustomerId(stripeCustomerId);
 
         if (oUser.isEmpty()) {
