@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,8 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -103,6 +103,38 @@ public class UserServiceTest {
         assertEquals("test", response.getUsername());
         assertEquals("test@test.com", response.getEmail());
         assertEquals(Role.ADMIN, response.getRole());
+
+        verify(passwordEncoder).encode("1234");
+        verify(uRepository).save(any(User.class));
+        verify(cService).addUserToCompany(any(User.class));
+    }
+
+    @Test
+    void shouldCreateUser() {
+        UserRegisterDTO dto = new UserRegisterDTO();
+        dto.setEmail("test@test.com");
+        dto.setUsername("test");
+        dto.setPassword("1234");
+        dto.setRole(Role.USER);
+
+        Company company = new Company();
+        company.setId(1L);
+        company.setName("Testing");
+
+        User currentUser = new User();
+        currentUser.setCompany(company);
+
+        UserService spyService = Mockito.spy(uService);
+        doReturn(currentUser).when(spyService).getCurrentUser();
+
+        when(passwordEncoder.encode("1234")).thenReturn("encoded1234");
+        when(uRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        UserResponseDTO response = spyService.createUser(dto);
+
+        assertEquals("test", response.getUsername());
+        assertEquals("test@test.com", response.getEmail());
+        assertEquals(Role.USER, response.getRole());
 
         verify(passwordEncoder).encode("1234");
         verify(uRepository).save(any(User.class));
