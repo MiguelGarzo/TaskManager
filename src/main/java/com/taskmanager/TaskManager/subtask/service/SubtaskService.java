@@ -126,6 +126,7 @@ public class SubtaskService {
         Subtask stask = sRepository.findByIdAndOwner_Company_Id(subtaskId, companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Subtask not found"));
 
+        tService.removeSubtaskFromTask(stask.getTask(), stask);
         sRepository.delete(stask);
     }
 

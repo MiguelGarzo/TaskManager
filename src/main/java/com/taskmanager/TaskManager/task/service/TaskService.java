@@ -25,8 +25,6 @@ public class TaskService {
     private final TaskRepository tRepository;
     private final UserRepository uRepository;
     private final UserService uService;
-    private final SubtaskRepository sRepository;
-    private final CommentaryRepository cRepository;
 
     public TaskResponseDTO toResponse(Task task) {
 
@@ -85,11 +83,9 @@ public class TaskService {
     }
 
     public List<TaskResponseDTO> userTasks() {
-
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Long companyId = uService.getCurrentCompanyId();
 
-        User user = uRepository.findByUsernameAndCompany_Id(username, companyId)
+        User user = uRepository.findByEmail(username)
                 .orElseThrow(() -> new EntityNotFoundException("User" + username + "not found"));
 
         List<Task> tasks = user.getTasks();

@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -84,5 +85,86 @@ public class TaskServiceTest {
         verify(uService).addTaskToList(any(Task.class), eq(user));
     }
 
+    @Test
+    void shouldReturnUserTasks() {
+        Company company = new Company();
+        company.setId(1L);
+
+        User owner = new User();
+        owner.setUsername("Owner");
+        owner.setCompany(company);
+
+        User user = new User();
+        user.setUsername("Test");
+        user.setCompany(company);
+
+        Task task1 = new Task();
+        task1.setName("Task1");
+        task1.setBody("Body1");
+        task1.setOwner(owner);
+        task1.setResponsible(user);
+
+        Task task2 = new Task();
+        task2.setName("Task2");
+        task2.setBody("Body2");
+        task2.setOwner(owner);
+        task2.setResponsible(user);
+
+        List<Task> tasks = List.of(task1, task2);
+
+        user.setTasks(tasks);
+
+        when(uService.getCurrentCompanyId()).thenReturn(1L);
+        when(uRepository.findByUsernameAndCompany_Id(eq("Test"), eq(1L)))
+                .thenReturn(Optional.of(user));
+
+        List<TaskResponseDTO> userTasks = tService.tasksByUser("Test");
+
+        assertEquals(2, userTasks.size());
+        assertEquals("Task1", userTasks.get(0).getName());
+        assertEquals("Task2", userTasks.get(1).getName());
+    }
+
+    @Test
+    void shouldReturnMyTasks() {
+        Company company = new Company();
+        company.setId(1L);
+
+        User user = new User();
+        user.setUsername("Test");
+        user.setCompany(company);
+        user.setEmail("test@test.com");
+
+        Task task1 = new Task();
+        task1.setResponsible(user);
+        task1.setOwner(user);
+        task1.setName("Test1");
+        task1.setBody("Body1");
+
+        Task task2 = new Task();
+        task2.setResponsible(user);
+        task2.setOwner(user);
+        task2.setName("Test2");
+        task2.setBody("Body2");
+
+        List<Task> userTasks = List.of(task1, task2);
+
+        user.setTasks(userTasks);
+
+        when(uRepository.findByEmail("test@test.com"))
+                .thenReturn(Optional.of(user));
+
+        Authentication auth = Mockito.mock(Authentication.class);
+        when(auth.getName()).thenReturn("test@test.com");
+        SecurityContext context = Mockito.mock(SecurityContext.class);
+        when(context.getAuthentication()).thenReturn(auth);
+        SecurityContextHolder.setContext(context);
+
+        List<TaskResponseDTO> tasks = tService.userTasks();
+
+        assertEquals(2, tasks.size());
+        assertEquals("Test1", tasks.get(0).getName());
+        assertEquals("Test2", tasks.get(1).getName());
+    }
 
 }
