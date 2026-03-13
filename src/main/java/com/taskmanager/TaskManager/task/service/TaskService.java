@@ -1,7 +1,9 @@
 package com.taskmanager.TaskManager.task.service;
 
+import com.taskmanager.TaskManager.commentary.dto.CommentResponseDTO;
 import com.taskmanager.TaskManager.commentary.entity.Commentary;
 import com.taskmanager.TaskManager.commentary.repository.CommentaryRepository;
+import com.taskmanager.TaskManager.subtask.dto.SubtaskResponseDTO;
 import com.taskmanager.TaskManager.subtask.entity.Subtask;
 import com.taskmanager.TaskManager.subtask.repository.SubtaskRepository;
 import com.taskmanager.TaskManager.task.dto.TaskRequestDTO;
@@ -17,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,13 +35,40 @@ public class TaskService {
         dto.setId(task.getId());
         dto.setBody(task.getBody());
         dto.setName(task.getName());
-        dto.setCommentary(task.getCommentary());
         dto.setOwnerUsername(task.getOwner().getUsername());
         dto.setResponsibleUsername(task.getResponsible().getUsername());
         dto.setInitDate(task.getInitDate());
         dto.setFinishDate(task.getFinishDate());
         dto.setPriority(task.getPriority());
         dto.setStatus(task.getStatus());
+
+        dto.setCommentary(
+                task.getCommentary().stream()
+                        .map(commentary -> {
+                            CommentResponseDTO cdto = new CommentResponseDTO();
+                            cdto.setCommentId(commentary.getId());
+                            cdto.setTaskId(commentary.getTask().getId());
+                            cdto.setCommentary(commentary.getCommentary());
+                            return cdto;
+                        })
+                        .collect(Collectors.toList())
+        );
+
+        dto.setSubtask(
+                task.getSubtask().stream()
+                        .map(stasks -> {
+                            SubtaskResponseDTO sdto = new SubtaskResponseDTO();
+                            sdto.setTaskId(stasks.getTask().getId());
+                            sdto.setName(stasks.getName());
+                            sdto.setBody(stasks.getBody());
+                            sdto.setCompleted(stasks.getCompleted());
+                            sdto.setOwnerUsername(stasks.getOwner().getUsername());
+                            sdto.setResponsibleUsername(stasks.getResponsible().getUsername());
+                            sdto.setSubtaskId(stasks.getId());
+                            return sdto;
+                        })
+                        .collect(Collectors.toList())
+        );
 
         return dto;
     }
