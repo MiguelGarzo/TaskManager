@@ -1,28 +1,27 @@
 package com.taskmanager.TaskManager.users.entity;
 
+import com.taskmanager.TaskManager.commentary.entity.Commentary;
 import com.taskmanager.TaskManager.company.entity.Company;
+import com.taskmanager.TaskManager.task.entity.Task;
 import com.taskmanager.TaskManager.users.Role;
 import com.taskmanager.TaskManager.users.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Data
+@Table(name = "users",
+uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"username", "company_id"})
+    }
+)
 public class User {
 
     @Id
@@ -34,7 +33,7 @@ public class User {
     private String email;
 
     @NotBlank(message = "Username can't be empty")
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String username;
 
     @NotBlank(message = "Password can't be empty")
@@ -52,4 +51,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status = Status.NORMAL;
+
+    @OneToMany(mappedBy = "responsible", cascade = CascadeType.ALL)
+    private List<Task> tasks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Commentary> comments = new ArrayList<>();
+
+    private String stripeCustomerId;
+
+    private String stripeSubscriptionId;
+
+    private String subscriptionStatus;
+
+    private Long currentPeriodEnd;
+
+
 }

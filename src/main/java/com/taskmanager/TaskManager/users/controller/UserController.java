@@ -1,39 +1,38 @@
 package com.taskmanager.TaskManager.users.controller;
 
+import com.stripe.exception.StripeException;
 import com.taskmanager.TaskManager.users.dto.UserLoginDTO;
 import com.taskmanager.TaskManager.users.dto.UserRegisterDTO;
 import com.taskmanager.TaskManager.users.dto.UserResponseDTO;
 import com.taskmanager.TaskManager.users.entity.User;
+import com.taskmanager.TaskManager.payment.StripeService;
 import com.taskmanager.TaskManager.users.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
-@RestController("/users")
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService service;
-
-    public UserController(UserService service) {
-        this.service = service;
-    }
-
+    private final StripeService stripeService;
+    
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAllCompanyUsers() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
-
-        return ResponseEntity.ok(service.getAllCompanyUsers(username));
+        return ResponseEntity.ok(service.getAllCompanyUsers());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> registerUser(@RequestBody UserRegisterDTO dto) {
 
@@ -47,6 +46,20 @@ public class UserController {
         String token = service.login(dto);
         return ResponseEntity.ok(token);
 
+    }
+
+    @PatchMapping("/upgrade")
+    public ResponseEntity<Map<String, String>> upgradeUser() throws StripeException {
+        try{
+            User currentUser = service.getCurrentUser();
+            String checkoutUrl = stripeService.createUpgradeSession(currentUser.getEmail());
+
+            return ResponseEntity.ok(Map.of("url", checkoutUrl));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (StripeException e) {
+            return ResponseEntity.internalServerError().body(Map.of("error", "Error while creating stripe session"));
+        }
     }
 
 }

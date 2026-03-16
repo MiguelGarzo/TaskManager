@@ -1,6 +1,7 @@
 package com.taskmanager.TaskManager.security;
 
 import com.taskmanager.TaskManager.users.entity.User;
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,12 +11,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+    private final Long companyId;
 
     public CustomUserDetails(User user) {
         this.user = user;
+        this.companyId = user.getCompany().getId();
     }
 
     @Override
@@ -29,9 +33,7 @@ public class CustomUserDetails implements UserDetails {
     }
 
     @Override
-    public String getUsername() {
-        return user.getUsername();
-    }
+    public String getUsername() { return user.getEmail(); }
 
     @Override
     public boolean isAccountNonExpired() {
@@ -56,4 +58,6 @@ public class CustomUserDetails implements UserDetails {
     public User getUser() {
         return user;
     }
+
+    public Long getCompanyId() { return companyId; }
 }
